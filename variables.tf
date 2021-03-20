@@ -37,6 +37,11 @@ variable "helm_enabled" {
   description = "Installs helm apps if set to true. Should be set to true only after Kubernetes cluster already exists."
 }
 
+variable "use_kubernetes_as_db_proxy" {
+  type        = bool
+  default     = false
+}
+
 variable "generate_ingress_dhparam" {
   type        = bool
   description = "Generate Diffie-Hellman key for ingress"

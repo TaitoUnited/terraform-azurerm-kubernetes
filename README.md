@@ -148,7 +148,7 @@ kubernetes:
   certManager:
     enabled: true
 
-  # TIP: You can install more infrastructure apps on you Kubernetes with:
+  # TIP: You can install more infrastructure apps on your Kubernetes with:
   # https://github.com/TaitoUnited/infra-apps-template
 ```
 
