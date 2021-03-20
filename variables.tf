@@ -31,44 +31,6 @@ variable "log_analytics_workspace_id" {
   default     = ""
 }
 
-variable "helm_enabled" {
-  type        = bool
-  default     = "false"
-  description = "Installs helm apps if set to true. Should be set to true only after Kubernetes cluster already exists."
-}
-
-variable "use_kubernetes_as_db_proxy" {
-  type        = bool
-  default     = false
-}
-
-variable "generate_ingress_dhparam" {
-  type        = bool
-  description = "Generate Diffie-Hellman key for ingress"
-}
-
-# NOTE: Remember to update also helm_apps.tf
-variable "ingress_nginx_version" {
-  type        = string
-  default     = "3.3.0"
-}
-
-# NOTE: Remember to update also helm_apps.tf
-variable "cert_manager_version" {
-  type        = string
-  default     = "1.0.2"
-}
-
-variable "kubernetes_admin_version" {
-  type        = string
-  default     = "1.8.0"
-}
-
-variable "socat_tunneler_version" {
-  type        = string
-  default     = "0.1.0"
-}
-
 variable "email" {
   type        = string
   description = "DevOps support email"
@@ -145,6 +107,24 @@ variable "permissions" {
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }
 
+# Helm infrastructure apps
+
+variable "helm_enabled" {
+  type        = bool
+  default     = "false"
+  description = "Installs helm apps if set to true. Should be set to true only after Kubernetes cluster already exists."
+}
+
+variable "generate_ingress_dhparam" {
+  type        = bool
+  description = "Generate Diffie-Hellman key for ingress"
+}
+
+variable "use_kubernetes_as_db_proxy" {
+  type        = bool
+  default     = false
+}
+
 variable "use_kubernetes_as_db_proxy" {
   type        = bool
   default     = false
@@ -160,4 +140,30 @@ variable "mysql_cluster_names" {
   type        = list(string)
   default     = []
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
+}
+
+# Helm app versions
+
+# NOTE: Remember to update also helm_apps.tf
+# TODO: Should be optional and null by default
+variable "ingress_nginx_version" {
+  type        = string
+  default     = "3.24.0"
+}
+
+# NOTE: Remember to update also helm_apps.tf
+# TODO: Should be optional and null by default
+variable "cert_manager_version" {
+  type        = string
+  default     = "1.2.0"
+}
+
+variable "kubernetes_admin_version" {
+  type        = string
+  default     = "1.8.0"
+}
+
+variable "socat_tunneler_version" {
+  type        = string
+  default     = "0.1.0"
 }
