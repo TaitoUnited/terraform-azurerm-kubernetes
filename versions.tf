@@ -15,6 +15,8 @@
  */
 
 terraform {
+  experiments = [module_variable_optional_attrs]
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -22,6 +24,7 @@ terraform {
     }
     helm = {
       source = "hashicorp/helm"
+      version = "=2.0.3"
     }
   }
   required_version = ">= 0.14"

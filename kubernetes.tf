@@ -64,7 +64,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
       managed                = local.kubernetes.azureAdManaged
 
       # Managed true
-      admin_group_object_ids = local.kubernetes.adminGroupObjectIds
+      admin_group_object_ids = local.permissions.adminGroupObjectIds
 
       # Managed false
       client_app_id          = local.kubernetes.clientAppId
@@ -78,17 +78,17 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   }
 
   oms_agent {
-    enabled                     = local.kubernetes.omsAgentEnabled
+    enabled                     = local.kubernetes.omsAgentEnabled != null ? local.kubernetes.omsAgentEnabled : false
     log_analytics_workspace_id  = var.log_analytics_workspace_id
   }
 
   addon_profile {
     aci_connector_linux {
-      enabled                   = local.kubernetes.aciEnabled
+      enabled                   = local.kubernetes.aciEnabled != null ? local.kubernetes.aciEnabled : false
       vnet_subnet_id            = var.subnet_id
     }
     azure_policy {
-      enabled                   = local.kubernetes.azurePolicyEnabled
+      enabled                   = local.kubernetes.azurePolicyEnabled != null ? local.kubernetes.azurePolicyEnabled : false
     }
   }
 

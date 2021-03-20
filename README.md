@@ -7,35 +7,34 @@ provider "azurerm" {
 }
 
 module "kubernetes" {
-  source                   = "TaitoUnited/kubernetes/azurerm"
-  version                  = "1.0.0"
+  source                     = "TaitoUnited/kubernetes/azurerm"
+  version                    = "1.0.0"
 
-  resource_group_name      = "my-infrastructure"
-  name                     = "my-infrastructure"
-  location                 = "northeurope"
-
-  # Settings
-  helm_enabled             = false  # Should be false on the first run, then true
-  email                    = "devops@mydomain.com"
-  generate_ingress_dhparam = false
+  resource_group_name        = "my-infrastructure"
+  name                       = "my-infrastructure"
+  location                   = "northeurope"
+  email                      = "devops@mydomain.com"
+  log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
 
   # Network
-  subnet_id                = module.network.internal_subnet_id
-  aci_enabled              = false
+  subnet_id                  = module.network.internal_subnet_id
 
   # Permissions
-  permissions              = yamldecode(
+  permissions                = yamldecode(
     file("${path.root}/../infra.yaml")
   )["permissions"]
 
   # Kubernetes
-  kubernetes               = yamldecode(
+  kubernetes                 = yamldecode(
     file("${path.root}/../infra.yaml")
   )["kubernetes"]
 
-  # Database clusters (for db proxies)
-  postgresql_cluster_names = [ "my-postgresql-1" ]
-  mysql_cluster_names      = [ "my-mysql-1" ]
+  # Helm infrastructure apps
+  helm_enabled               = false  # Should be false on the first run, then true
+  generate_ingress_dhparam   = false
+  use_kubernetes_as_db_proxy = true
+  postgresql_cluster_names   = [ "my-postgresql-1" ]
+  mysql_cluster_names        = [ "my-mysql-1" ]
 }
 ```
 
@@ -44,6 +43,7 @@ Example YAML:
 ```
 # Permissions
 permissions:
+  adminGroupObjectIds: [ "1234567a-123b-123c-123d-1e2345a6c7e8" ]
   clusterRoles:
     - name: taito-iam-admin
       subjects: [ "group:TODO" ]
@@ -68,17 +68,34 @@ permissions:
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool
 kubernetes:
   name: zone1-common-kube1
+  skuTier: Free  # Free, Paid
+  automaticChannelUpgrade: stable  # none, patch, rapid, stable
+
+  # Network
+  networkPlugin: azure  # azure, kubenet
+  networkPolicy: azure  # azure, calico
+  privateClusterEnabled: false
   masterAuthorizedNetworks:
     - 0.0.0.0/0
+
+  # RBAC
+  rbacEnabled: true
+  azureAdManaged: true
+
+  # Monitoring
+  omsAgentEnabled: true
+
+  # Add-ons
+  aciEnabled: false
+  azurePolicyEnabled: false
 
   # Node pools
   nodePools:
     - name: pool-1
-      machineType: n1-standard-1
-      minNodeCount: 1
-    - name: pool-2
-      machineType: n1-standard-1
-      minNodeCount: 1
+      vmSize: Standard_D2_v2
+      availabilityZones: 1 2 3
+      minNodeCount: 3
+      maxNodeCount: 3
 
   # Ingress controllers
   ingressNginxControllers:
@@ -131,23 +148,8 @@ kubernetes:
   certManager:
     enabled: true
 
-  # Platforms
-  istio:
-    enabled: false
-  knative:
-    enabled: false # Using Google Cloud Run
-
-  # Logging, monitoring, and tracing
-  falco:
-    enabled: false # NOTE: Not supported yet
-  jaeger:
-    enabled: false # NOTE: Not supported yet
-  sentry:
-    enabled: false # NOTE: Not supported yet
-
-  # CI/CD
-  jenkinsx:
-    enabled: false # NOTE: Not supported yet
+  # TIP: You can install more infrastructure apps on you Kubernetes with:
+  # https://github.com/TaitoUnited/infra-apps-template
 ```
 
 YAML attributes:

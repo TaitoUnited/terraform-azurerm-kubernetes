@@ -26,6 +26,11 @@ variable "location" {
   type        = string
 }
 
+variable "log_analytics_workspace_id" {
+  type        = string
+  default     = ""
+}
+
 variable "helm_enabled" {
   type        = bool
   default     = "false"
@@ -72,40 +77,46 @@ variable "subnet_id" {
 variable "kubernetes" {
   type = object({
     name = string
+    skuTier = string # Paid, Free
+    automaticChannelUpgrade = string # none, patch, rapid, and stable
+    # Network
+    networkPlugin = string
+    networkPolicy = optional(string)
+    privateClusterEnabled = bool
     masterAuthorizedNetworks = list(string)
+    # RBAC
+    rbacEnabled = bool
+    azureAdTenantId = optional(string)
+    azureAdManaged = bool
+    clientAppId = optional(string)
+    serverAppId = optional(string)
+    serverAppSecret = optional(string)
+    # Monitoring
+    omsAgentEnabled = optional(bool)
+    # Add-ons
+    aciEnabled = optional(bool)
+    azurePolicyEnabled = optional(bool)
     nodePools = list(object({
-      machineType = string
+      name = string
+      vmSize = string
+      osType = optional(string)
+      orchestratorVersion = optional(string)
+      enableHostEncryption = optional(bool)
+      availabilityZones = string
       minNodeCount = number
+      maxNodeCount = number
     }))
     ingressNginxControllers = list(object({
       name = string
       class = string
       replicas = number
-      metricsEnabled = bool
-      maxmindLicenseKey = string
+      metricsEnabled = optional(bool)
+      maxmindLicenseKey = optional(string)
       configMap = map(string)
       tcpServices = map(string)
       udpServices = map(string)
     }))
     certManager = object({
-      enabled = bool
-    })
-    istio = object({
-      enabled = bool
-    })
-    knative = object({
-      enabled = bool
-    })
-    falco = object({
-      enabled = bool
-    })
-    jaeger = object({
-      enabled = bool
-    })
-    sentry = object({
-      enabled = bool
-    })
-    jenkinsx = object({
       enabled = bool
     })
   })
@@ -127,6 +138,11 @@ variable "permissions" {
     }))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
+}
+
+variable "use_kubernetes_as_db_proxy" {
+  type        = bool
+  default     = false
 }
 
 variable "postgresql_cluster_names" {
