@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-output "id" {
-  value = azurerm_kubernetes_cluster.kubernetes.id
+output "kubernetes_id" {
+  value = azurerm_kubernetes_cluster.kubernetes[0].id
 }
 
-output "fqdn" {
-  value = azurerm_kubernetes_cluster.kubernetes.fqdn
+output "kubernetes_fqdn" {
+  value = azurerm_kubernetes_cluster.kubernetes[0].fqdn
 }
 
-output "private_fqdn" {
-  value = azurerm_kubernetes_cluster.kubernetes.private_fqdn
+output "kubernetes_private_fqdn" {
+  value = azurerm_kubernetes_cluster.kubernetes[0].private_fqdn
 }

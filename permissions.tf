@@ -20,7 +20,7 @@ resource "random_uuid" "kubernetes_acrpull_id" {
   count                = local.kubernetes.name != "" ? 1 : 0
   keepers = {
     acr_id  = azurerm_container_registry.acr.id
-    sp_id   = azurerm_kubernetes_cluster.kubernetes.kubelet_identity[0].object_id
+    sp_id   = azurerm_kubernetes_cluster.kubernetes[0].kubelet_identity[0].object_id
     role    = "AcrPull"
   }
 }
@@ -28,7 +28,7 @@ resource "random_uuid" "kubernetes_acrpull_id" {
 resource "azurerm_role_assignment" "kubernetes_acrpull" {
   count                = local.kubernetes.name != "" ? 1 : 0
 
-  principal_id         = azurerm_kubernetes_cluster.kubernetes.kubelet_identity[0].object_id
+  principal_id         = azurerm_kubernetes_cluster.kubernetes[0].kubelet_identity[0].object_id
   name                 = random_uuid.kubernetes_acrpull_id[count.index].result
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
@@ -40,15 +40,16 @@ resource "azurerm_role_assignment" "kubernetes_acrpull" {
 resource "random_uuid" "kubernetes_monitoring_id" {
   count                = local.kubernetes.name != "" ? 1 : 0
   keepers = {
-    sp_id   = azurerm_kubernetes_cluster.kubernetes.identity[0].principal_id
+    sp_id   = azurerm_kubernetes_cluster.kubernetes[0].identity[0].principal_id
     role    = "Monitoring Metrics Publisher"
   }
 }
 
 resource "azurerm_role_assignment" "kubernetes_monitoring" {
-  principal_id         = azurerm_kubernetes_cluster.kubernetes.identity[0].principal_id
+  count                = local.kubernetes.name != "" ? 1 : 0
+  principal_id         = azurerm_kubernetes_cluster.kubernetes[0].identity[0].principal_id
   name                 = random_uuid.kubernetes_monitoring_id[count.index].result
-  scope                = azurerm_kubernetes_cluster.kubernetes.id
+  scope                = azurerm_kubernetes_cluster.kubernetes[0].id
   role_definition_name = "Monitoring Metrics Publisher"
 }
 
@@ -57,7 +58,7 @@ resource "azurerm_role_assignment" "kubernetes_monitoring" {
 resource "random_uuid" "kubernetes_network_id" {
   count                = local.kubernetes.name != "" ? 1 : 0
   keepers = {
-    sp_id   = azurerm_kubernetes_cluster.kubernetes.identity[0].principal_id
+    sp_id   = azurerm_kubernetes_cluster.kubernetes[0].identity[0].principal_id
     role    = "Network Contributor"
   }
 }
@@ -65,7 +66,7 @@ resource "random_uuid" "kubernetes_network_id" {
 resource "azurerm_role_assignment" "kubernetes_network" {
   count                = local.kubernetes.name != "" ? 1 : 0
 
-  principal_id         = azurerm_kubernetes_cluster.kubernetes.identity[0].principal_id
+  principal_id         = azurerm_kubernetes_cluster.kubernetes[0].identity[0].principal_id
   name                 = random_uuid.kubernetes_network_id[count.index].result
   scope                = var.subnet_id
   role_definition_name = "Network Contributor"

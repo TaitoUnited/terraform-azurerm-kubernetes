@@ -27,7 +27,7 @@ data "azurerm_mysql_server" "mysql" {
 }
 
 resource "helm_release" "postgres_proxy" {
-  depends_on = [module.kubernetes, module.helm_apps]
+  depends_on = [azurerm_kubernetes_cluster.kubernetes, module.helm_apps]
 
   for_each   = {for item in (local.helmEnabled ? local.postgresqlClusterNames : []): item => item}
   name       = each.value
@@ -50,7 +50,7 @@ resource "helm_release" "postgres_proxy" {
 }
 
 resource "helm_release" "mysql_proxy" {
-  depends_on = [module.kubernetes, helm_release.postgres_proxy]
+  depends_on = [azurerm_kubernetes_cluster.kubernetes, helm_release.postgres_proxy]
 
   for_each   = {for item in (local.helmEnabled ? local.mysqlClusterNames : []): item => item}
   name       = each.value

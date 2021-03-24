@@ -73,27 +73,21 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     }
   }
 
-  kube_dashboard {
-    enabled = false
-  }
-
-  oms_agent {
-    enabled                     = local.kubernetes.omsAgentEnabled != null ? local.kubernetes.omsAgentEnabled : false
-    log_analytics_workspace_id  = var.log_analytics_workspace_id
-  }
-
   addon_profile {
+    kube_dashboard {
+      enabled = false
+    }
+    oms_agent {
+      enabled                     = local.kubernetes.omsAgentEnabled != null ? local.kubernetes.omsAgentEnabled : false
+      log_analytics_workspace_id  = var.log_analytics_workspace_id
+    }
     aci_connector_linux {
       enabled                   = local.kubernetes.aciEnabled != null ? local.kubernetes.aciEnabled : false
-      vnet_subnet_id            = var.subnet_id
+      subnet_name               = var.subnet_id  # TODO: ok?
     }
     azure_policy {
       enabled                   = local.kubernetes.azurePolicyEnabled != null ? local.kubernetes.azurePolicyEnabled : false
     }
-  }
-
-  tags = {
-    zone = var.name
   }
 
   lifecycle {
@@ -105,7 +99,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "pool" {
   for_each               = {for item in (local.kubernetes.name != "" ? local.nodePools : []): item.name => item}
 
   name                   = each.value.name
-  kubernetes_cluster_id  = azurerm_kubernetes_cluster.kubernetes.id
+  kubernetes_cluster_id  = azurerm_kubernetes_cluster.kubernetes[0].id
   vm_size                = each.value.vmSize
   os_type                = each.value.osType
   orchestrator_version   = each.value.orchestratorVersion
@@ -116,6 +110,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "pool" {
 
   enable_auto_scaling    = each.value.minNodeCount != each.value.maxNodeCount
   node_count             = each.value.minNodeCount
-  minNodeCount           = each.value.minNodeCount != each.value.maxNodeCount ? each.value.minNodeCount : null
-  maxNodeCount           = each.value.minNodeCount != each.value.maxNodeCount ? each.value.maxNodeCount : null
+  min_count              = each.value.minNodeCount != each.value.maxNodeCount ? each.value.minNodeCount : null
+  max_count              = each.value.minNodeCount != each.value.maxNodeCount ? each.value.maxNodeCount : null
 }

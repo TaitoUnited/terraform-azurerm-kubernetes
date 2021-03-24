@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-variable "resource_group_name" {
+variable "name" {
   type        = string
 }
 
-variable "name" {
+variable "resource_group_name" {
   type        = string
 }
 
@@ -51,6 +51,8 @@ variable "kubernetes" {
     networkPolicy = optional(string)
     privateClusterEnabled = bool
     masterAuthorizedNetworks = list(string)
+    # Policies
+    podSecurityPolicyEnabled = bool
     # RBAC
     rbacEnabled = bool
     azureAdTenantId = optional(string)
@@ -92,6 +94,7 @@ variable "kubernetes" {
 
 variable "permissions" {
   type = object({
+    adminGroupObjectIds = list(string)
     clusterRoles = list(object({
       name = string
       subjects = list(string)
@@ -118,11 +121,6 @@ variable "helm_enabled" {
 variable "generate_ingress_dhparam" {
   type        = bool
   description = "Generate Diffie-Hellman key for ingress"
-}
-
-variable "use_kubernetes_as_db_proxy" {
-  type        = bool
-  default     = false
 }
 
 variable "use_kubernetes_as_db_proxy" {

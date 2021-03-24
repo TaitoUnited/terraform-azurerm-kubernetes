@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+provider "azurerm" {
+  features {}
+}
+
 locals {
   kubernetes               = var.kubernetes
   permissions              = var.permissions
