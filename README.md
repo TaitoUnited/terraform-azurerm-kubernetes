@@ -92,7 +92,7 @@ kubernetes:
 
   # Node pools
   nodePools:
-    - name: pool-1
+    - name: pool1
       vmSize: Standard_D2_v2
       availabilityZones: [ "1", "2", "3" ]
       minNodeCount: 3
