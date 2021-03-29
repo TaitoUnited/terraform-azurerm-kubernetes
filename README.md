@@ -80,8 +80,8 @@ kubernetes:
     - 0.0.0.0/0
 
   # RBAC
-  rbacEnabled: true
-  azureAdManaged: true
+  rbacEnabled: false
+  azureAdManaged: false
 
   # Monitoring
   omsAgentEnabled: true
@@ -97,6 +97,10 @@ kubernetes:
       availabilityZones: 1 2 3
       minNodeCount: 3
       maxNodeCount: 3
+
+  # Certificate managers
+  certManager:
+    enabled: true
 
   # Ingress controllers
   ingressNginxControllers:
@@ -144,10 +148,6 @@ kubernetes:
         block-cidrs: ""
         block-user-agents: ""
         block-referers: ""
-
-  # Certificate managers
-  certManager:
-    enabled: true
 
   # TIP: You can install more infrastructure apps on your Kubernetes with:
   # https://github.com/TaitoUnited/infra-apps-template
