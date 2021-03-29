@@ -51,8 +51,6 @@ variable "kubernetes" {
     networkPolicy = optional(string)
     privateClusterEnabled = bool
     masterAuthorizedNetworks = list(string)
-    # Policies
-    podSecurityPolicyEnabled = bool
     # RBAC
     rbacEnabled = bool
     azureAdTenantId = optional(string)
@@ -75,7 +73,7 @@ variable "kubernetes" {
       minNodeCount = number
       maxNodeCount = number
     }))
-    ingressNginxControllers = list(object({
+    ingressNginxControllers = optional(list(object({
       name = string
       class = string
       replicas = number
@@ -84,28 +82,28 @@ variable "kubernetes" {
       configMap = map(string)
       tcpServices = map(string)
       udpServices = map(string)
-    }))
-    certManager = object({
+    })))
+    certManager = optional(object({
       enabled = bool
-    })
+    }))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }
 
 variable "permissions" {
   type = object({
-    adminGroupObjectIds = list(string)
-    clusterRoles = list(object({
+    adminGroupObjectIds = optional(list(string))
+    clusterRoles = optional(list(object({
       name = string
       subjects = list(string)
-    }))
-    namespaces = list(object({
+    })))
+    namespaces = optional(list(object({
       name = string
       clusterRoles = list(object({
         name = string
         subjects = list(string)
       }))
-    }))
+    })))
   })
   description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
 }

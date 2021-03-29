@@ -19,22 +19,14 @@ provider "azurerm" {
 }
 
 locals {
-  kubernetes               = var.kubernetes
-  permissions              = var.permissions
-  postgresqlClusterNames   = var.use_kubernetes_as_db_proxy ? var.postgresql_cluster_names : []
-  mysqlClusterNames        = var.use_kubernetes_as_db_proxy ? var.mysql_cluster_names : []
+  kubernetes              = var.kubernetes
+  permissions             = var.permissions
+  postgresqlClusterNames  = var.use_kubernetes_as_db_proxy ? var.postgresql_cluster_names : []
+  mysqlClusterNames       = var.use_kubernetes_as_db_proxy ? var.mysql_cluster_names : []
 
-  helmEnabled              = var.helm_enabled
+  helmEnabled             = var.helm_enabled
 
-  nodePools = (
-    local.kubernetes.nodePools != null
-    ? local.kubernetes.nodePools
-    : []
-  )
+  nodePools               = try(local.kubernetes.nodePools, [])
 
-  ingressNginxControllers = (
-    local.kubernetes.ingressNginxControllers != null
-    ? local.kubernetes.ingressNginxControllers
-    : []
-  )
+  ingressNginxControllers = try(local.kubernetes.ingressNginxControllers, [])
 }

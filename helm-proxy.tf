@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-data "azurerm_postgresql_server" "postgresql" {
+data "azurerm_sql_server" "postgresql" {
   for_each            = {for item in (local.helmEnabled ? local.postgresqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
   name                = each.value
 }
 
-data "azurerm_mysql_server" "mysql" {
+data "azurerm_sql_server" "mysql" {
   for_each            = {for item in (local.helmEnabled ? local.mysqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
   name                = each.value
@@ -40,7 +40,7 @@ resource "helm_release" "postgres_proxy" {
 
   set {
     name  = "tunnel.host"
-    value = data.azurerm_postgresql_server.postgresql[each.key].fqdn
+    value = data.azurerm_sql_server.postgresql[each.key].fqdn
   }
 
   set {
@@ -62,7 +62,7 @@ resource "helm_release" "mysql_proxy" {
 
   set {
     name  = "tunnel.host"
-    value = data.azurerm_mysql_server.mysql[each.key].fqdn
+    value = data.azurerm_sql_server.mysql[each.key].fqdn
   }
 
   set {

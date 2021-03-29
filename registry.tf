@@ -22,8 +22,10 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled            = false
   georeplication_locations = null
 
+  /* TODO: enable for Premium sku
   retention_policy {
     enabled = true
     days    = 7
   }
+  */
 }
