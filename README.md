@@ -13,6 +13,7 @@ module "kubernetes" {
 
   name                       = "my-infrastructure"
   resource_group_name        = "my-infrastructure"
+  node_resource_group_name   = "my-infrastructure-nodes"
   location                   = "northeurope"
   email                      = "devops@mydomain.com"
   log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
