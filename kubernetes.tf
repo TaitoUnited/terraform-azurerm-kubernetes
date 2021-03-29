@@ -64,21 +64,24 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   # https://github.com/jcorioland/aks-rbac-azure-ad
   # https://www.danielstechblog.io/terraform-deploy-an-aks-cluster-using-managed-identity-and-managed-azure-ad-integration/
   # https://github.com/hashicorp/terraform-provider-azuread/issues/104
-  role_based_access_control {
-    enabled                  = local.kubernetes.rbacEnabled
+  dynamic "role_based_access_control" {
+    for_each = local.kubernetes.rbacEnabled ? [ 1 ] : []
+    content {
+      enabled                  = local.kubernetes.rbacEnabled
 
-    azure_active_directory {
-      tenant_id              = local.kubernetes.azureAdTenantId
+      azure_active_directory {
+        tenant_id              = local.kubernetes.azureAdTenantId
 
-      managed                = local.kubernetes.azureAdManaged
+        managed                = local.kubernetes.azureAdManaged
 
-      # Managed true
-      admin_group_object_ids = try(local.permissions.adminGroupObjectIds, [])
+        # Managed true
+        admin_group_object_ids = try(local.permissions.adminGroupObjectIds, [])
 
-      # Managed false
-      client_app_id          = local.kubernetes.clientAppId
-      server_app_id          = local.kubernetes.serverAppId
-      server_app_secret      = local.kubernetes.serverAppSecret
+        # Managed false
+        client_app_id          = local.kubernetes.clientAppId
+        server_app_id          = local.kubernetes.serverAppId
+        server_app_secret      = local.kubernetes.serverAppSecret
+      }
     }
   }
 
