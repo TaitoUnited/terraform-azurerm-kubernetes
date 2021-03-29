@@ -29,10 +29,19 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   api_server_authorized_ip_ranges = local.kubernetes.masterAuthorizedNetworks
 
   default_node_pool {
-    name               = "default"
-    node_count         = 0
-    vm_size            = "Standard_D2_v2"
-    vnet_subnet_id     = local.kubernetes.networkPlugin == "azure" ? var.subnet_id : null
+    name                   = local.kubernetes.nodePools[0].name
+    vm_size                = local.kubernetes.nodePools[0].vmSize
+    # os_type                = local.kubernetes.nodePools[0].osType
+    orchestrator_version   = local.kubernetes.nodePools[0].orchestratorVersion
+    enable_host_encryption = local.kubernetes.nodePools[0].enableHostEncryption
+
+    availability_zones     = local.kubernetes.nodePools[0].availabilityZones
+    vnet_subnet_id         = local.kubernetes.networkPlugin == "azure" ? var.subnet_id : null
+
+    enable_auto_scaling    = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount
+    node_count             = local.kubernetes.nodePools[0].minNodeCount
+    min_count              = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount ? local.kubernetes.nodePools[0].minNodeCount : null
+    max_count              = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount ? local.kubernetes.nodePools[0].maxNodeCount : null
   }
 
   network_profile {
@@ -96,7 +105,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "pool" {
-  for_each               = {for item in (local.kubernetes.name != "" ? local.nodePools : []): item.name => item}
+  for_each   = {for item in slice(local.kubernetes.nodePools, 1, length(local.kubernetes.nodePools)): item.name => item}
 
   name                   = each.value.name
   kubernetes_cluster_id  = azurerm_kubernetes_cluster.kubernetes[0].id
