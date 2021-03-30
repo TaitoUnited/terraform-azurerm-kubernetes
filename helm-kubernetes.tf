@@ -17,10 +17,8 @@
 resource "helm_release" "kubernetes_admin" {
   depends_on = [
     azurerm_kubernetes_cluster.kubernetes,
-    /*
     helm_release.postgres_proxy,
     helm_release.mysql_proxy
-    */
   ]
 
   count      = local.helmEnabled ? 1 : 0

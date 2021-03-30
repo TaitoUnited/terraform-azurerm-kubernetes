@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-/*
-data "azurerm_sql_server" "postgresql" {
+data "azurerm_private_endpoint_connection" "postgresql" {
   for_each            = {for item in (local.helmEnabled ? local.postgresqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
-  name                = "${each.value}.postgres.database.azure.com"
+  name                = "${each.value}-endpoint"
 }
 
-data "azurerm_sql_server" "mysql" {
+data "azurerm_private_endpoint_connection" "mysql" {
   for_each            = {for item in (local.helmEnabled ? local.mysqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
-  name                = "${each.value}.mysql.database.azure.com"
+  name                = "${each.value}-endpoint"
 }
 
 resource "helm_release" "postgres_proxy" {
@@ -34,14 +33,14 @@ resource "helm_release" "postgres_proxy" {
   name       = each.value
   namespace  = "db-proxy"
   create_namespace = true
-  repository = "https://kubernetes-charts.storage.googleapis.com/"
+  repository = "https://isotoma.github.io/charts/"
   chart      = "socat-tunneller"
   version    = var.socat_tunneler_version
   wait       = false
 
   set {
     name  = "tunnel.host"
-    value = data.azurerm_sql_server.postgresql[each.key].fqdn
+    value = data.azurerm_private_endpoint_connection.postgresql[each.key].private_service_connection[0].private_ip_address
   }
 
   set {
@@ -56,14 +55,14 @@ resource "helm_release" "mysql_proxy" {
   for_each   = {for item in (local.helmEnabled ? local.mysqlClusterNames : []): item => item}
   name       = each.value
   namespace  = "db-proxy"
-  repository = "https://kubernetes-charts.storage.googleapis.com/"
+  repository = "https://isotoma.github.io/charts/"
   chart      = "socat-tunneller"
   version    = var.socat_tunneler_version
   wait       = false
 
   set {
     name  = "tunnel.host"
-    value = data.azurerm_sql_server.mysql[each.key].fqdn
+    value = data.azurerm_private_endpoint_connection.mysql[each.key].private_service_connection[0].private_ip_address
   }
 
   set {
@@ -71,4 +70,3 @@ resource "helm_release" "mysql_proxy" {
     value = 3306
   }
 }
-*/

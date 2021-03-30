@@ -161,5 +161,5 @@ variable "kubernetes_admin_version" {
 
 variable "socat_tunneler_version" {
   type        = string
-  default     = "0.1.0"
+  default     = "0.1.5"
 }
