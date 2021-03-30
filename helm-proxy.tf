@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 data "azurerm_sql_server" "postgresql" {
   for_each            = {for item in (local.helmEnabled ? local.postgresqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
@@ -70,3 +71,4 @@ resource "helm_release" "mysql_proxy" {
     value = 3306
   }
 }
+*/
