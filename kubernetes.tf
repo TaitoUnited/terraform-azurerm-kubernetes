@@ -21,7 +21,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   dns_prefix          = local.kubernetes.name
   location            = var.location
   resource_group_name = var.resource_group_name
-  node_resource_group = "${local.kubernetes.name}-pools"
+  node_resource_group = "${var.resource_group_name}-${local.kubernetes.name}"
 
   sku_tier                        = local.kubernetes.skuTier                   # Free, Paid
   automatic_channel_upgrade       = local.kubernetes.automaticChannelUpgrade   # none, patch, rapid, and stable
