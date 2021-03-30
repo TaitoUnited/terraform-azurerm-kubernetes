@@ -44,25 +44,42 @@ Example YAML:
 ```
 # Permissions
 permissions:
-  adminGroupObjectIds: [ "1234567a-123b-123c-123d-1e2345a6c7e8" ]
+  # NOTE: adminGroupObjectIds is used only if azureAdManaged is true
+  # adminGroupObjectIds: [ "ADMINS_GROUP_ID" ]
+
+  # Cluster-wide permissions
   clusterRoles:
     - name: taito-iam-admin
-      subjects: [ "group:TODO" ]
+      subjects: [ "ADMINS_GROUP_ID" ]
     - name: taito-status-viewer
-      subjects: [ "group:TODO" ]
+      subjects: [ "DEVELOPERS_GROUP_ID" ]
+
+  # Namespace specific permissions
   namespaces:
+    - name: common
+      clusterRoles:
+        - name: taito-secret-viewer
+          subjects:
+            - DEVELOPERS_GROUP_ID
+            - CICD_TESTER_USER_ID
     - name: db-proxy
       clusterRoles:
         - name: taito-pod-portforwarder
-          subjects: [ "user:TODO" ]
+          subjects:
+            - DEVELOPERS_GROUP_ID
+            - CICD_TESTER_USER_ID
     - name: my-namespace
       clusterRoles:
-        - name: taito-status-viewer
-          subjects: [ "user:TODO" ]
+        - name: taito-developer
+          subjects:
+            - SOME_USER_ID
+            - ANOTHER_USER_ID
     - name: another-namespace
       clusterRoles:
         - name: taito-developer
-          subjects: [ "user:TODO" ]
+          subjects:
+            - SOME_USER_ID
+            - ANOTHER_USER_ID            
 
 # For Kubernetes setting descriptions, see
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster

@@ -17,13 +17,13 @@
 data "azurerm_sql_server" "postgresql" {
   for_each            = {for item in (local.helmEnabled ? local.postgresqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
-  name                = each.value
+  name                = "${each.value}.postgres.database.azure.com"
 }
 
 data "azurerm_sql_server" "mysql" {
   for_each            = {for item in (local.helmEnabled ? local.mysqlClusterNames : []): item => item}
   resource_group_name = var.resource_group_name
-  name                = each.value
+  name                = "${each.value}.mysql.database.azure.com"
 }
 
 resource "helm_release" "postgres_proxy" {
