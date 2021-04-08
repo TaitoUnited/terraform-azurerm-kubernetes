@@ -45,14 +45,17 @@ Example YAML:
 # Permissions
 permissions:
   # NOTE: adminGroupObjectIds is used only if azureAdManaged is true
-  # adminGroupObjectIds: [ "ADMINS_GROUP_ID" ]
+  adminGroupObjectIds:
+    - MY_USER_OBJECT_ID
 
   # Cluster-wide permissions
   clusterRoles:
     - name: taito-iam-admin
-      subjects: [ "ADMINS_GROUP_ID" ]
+      subjects:
+        - group:ADMINS_GROUP_ID
     - name: taito-status-viewer
-      subjects: [ "DEVELOPERS_GROUP_ID" ]
+      subjects:
+        - group:DEVELOPERS_GROUP_ID
 
   # Namespace specific permissions
   namespaces:
@@ -60,26 +63,26 @@ permissions:
       clusterRoles:
         - name: taito-secret-viewer
           subjects:
-            - DEVELOPERS_GROUP_ID
-            - CICD_TESTER_USER_ID
+            - group:DEVELOPERS_GROUP_ID
+            - user:CICD_TESTER_USER_ID
     - name: db-proxy
       clusterRoles:
         - name: taito-pod-portforwarder
           subjects:
-            - DEVELOPERS_GROUP_ID
-            - CICD_TESTER_USER_ID
+            - group:DEVELOPERS_GROUP_ID
+            - user:CICD_TESTER_USER_ID
     - name: my-namespace
       clusterRoles:
         - name: taito-developer
           subjects:
-            - SOME_USER_ID
-            - ANOTHER_USER_ID
+            - user:SOME_USER_ID
+            - user:ANOTHER_USER_ID
     - name: another-namespace
       clusterRoles:
         - name: taito-developer
           subjects:
-            - SOME_USER_ID
-            - ANOTHER_USER_ID            
+            - user:SOME_USER_ID
+            - user:ANOTHER_USER_ID            
 
 # For Kubernetes setting descriptions, see
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster
@@ -97,8 +100,8 @@ kubernetes:
     - 0.0.0.0/0
 
   # RBAC
-  rbacEnabled: false
-  azureAdManaged: false
+  rbacEnabled: true
+  azureAdManaged: true
 
   # Monitoring
   omsAgentEnabled: true
@@ -174,6 +177,7 @@ YAML attributes:
 
 - See variables.tf for all the supported YAML attributes.
 - See [kubernetes_cluster](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster) and [kubernetes_cluster_node_pool](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool) for attribute descriptions.
+- See [Cluster Roles](https://github.com/TaitoUnited/taito-charts/blob/master/kubernetes-admin/templates/clusterrole.yaml) of kubernetes-admin Helm Chart for all predefined role definitions (e.g. taito-developer, taito-status-viewer, taito-secret-viewer).
 
 Combine with the following modules to get a complete infrastructure defined by YAML:
 
