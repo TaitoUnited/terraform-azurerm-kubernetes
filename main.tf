@@ -26,7 +26,7 @@ locals {
 
   helmEnabled             = var.helm_enabled
 
-  nodePools               = try(local.kubernetes.nodePools, [])
+  nodePools               = coalesce(local.kubernetes.nodePools, [])
 
-  ingressNginxControllers = try(local.kubernetes.ingressNginxControllers, [])
+  ingressNginxControllers = coalesce(local.kubernetes.ingressNginxControllers, [])
 }

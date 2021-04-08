@@ -75,7 +75,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
         managed                = local.kubernetes.azureAdManaged
 
         # Managed true
-        admin_group_object_ids = try(local.permissions.adminGroupObjectIds, [])
+        admin_group_object_ids = coalesce(local.permissions.adminGroupObjectIds, [])
 
         # Managed false
         client_app_id          = local.kubernetes.clientAppId
