@@ -71,18 +71,19 @@ permissions:
           subjects:
             - group:DEVELOPERS_GROUP_ID
             - user:CICD_TESTER_USER_ID
-    - name: my-namespace
+    - name: my-project-dev
+      clusterRoles:
+        - name: taito-iam-admin
+          subjects:
+            - user:SOME_USER_ID
+        - name: taito-developer
+          subjects:
+            - group:SOME_GROUP_ID
+    - name: my-project-prod
       clusterRoles:
         - name: taito-developer
           subjects:
             - user:SOME_USER_ID
-            - user:ANOTHER_USER_ID
-    - name: another-namespace
-      clusterRoles:
-        - name: taito-developer
-          subjects:
-            - user:SOME_USER_ID
-            - user:ANOTHER_USER_ID            
 
 # For Kubernetes setting descriptions, see
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster
