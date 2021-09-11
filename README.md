@@ -42,11 +42,16 @@ module "kubernetes" {
 Example YAML:
 
 ```
+# IMPORTANT: Roles are assigned using the object id of a user or group. However,
+# there is an exception. If user belongs to the same AD tenant, you should use
+# the userPrincipalName instead (e.g. john.doe@domain.com).
+
 # Permissions
 permissions:
   # NOTE: adminGroupObjectIds is used only if azureAdManaged is true
+  # NOTE: You must always use object id here instead of userPrincipalName.
   adminGroupObjectIds:
-    - MY_USER_OBJECT_ID
+    - GROUP_OBJECT_ID OR USER_OBJECT_ID
 
   # Cluster-wide permissions
   clusterRoles:
@@ -64,18 +69,16 @@ permissions:
         - name: taito-secret-viewer
           subjects:
             - group:DEVELOPERS_GROUP_ID
-            - user:CICD_TESTER_USER_ID
     - name: db-proxy
       clusterRoles:
         - name: taito-pod-portforwarder
           subjects:
             - group:DEVELOPERS_GROUP_ID
-            - user:CICD_TESTER_USER_ID
     - name: my-project-dev
       clusterRoles:
         - name: taito-iam-admin
           subjects:
-            - user:SOME_USER_ID
+            - user:SOME_USER_ID OR USER_PRINCIPAL_NAME
         - name: taito-developer
           subjects:
             - group:SOME_GROUP_ID
@@ -83,7 +86,7 @@ permissions:
       clusterRoles:
         - name: taito-developer
           subjects:
-            - user:SOME_USER_ID
+            - user:SOME_USER_ID OR USER_PRINCIPAL_NAME
 
 # For Kubernetes setting descriptions, see
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster
