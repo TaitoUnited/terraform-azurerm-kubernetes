@@ -46,6 +46,15 @@ variable "kubernetes" {
     name = string
     skuTier = string # Paid, Free
     automaticChannelUpgrade = string # none, patch, rapid, and stable
+    maintenanceAllowed = optional(list(object({
+      day = string
+      hours = list(string)
+    })))
+    maintenanceNotAllowed = optional(list(object({
+      start = string
+      end = string
+    })))
+    
     # Network
     networkPlugin = string
     networkPolicy = optional(string)

@@ -28,6 +28,24 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   private_cluster_enabled         = local.kubernetes.privateClusterEnabled
   api_server_authorized_ip_ranges = local.kubernetes.masterAuthorizedNetworks
 
+  maintenance_window {
+    dynamic "allowed" {
+      for_each = local.kubernetes.maintenanceAllowed != null ? [ local.kubernetes.maintenanceAllowed ] : []
+      content {
+        day = allowed.value.day
+        hours = allowed.value.hours
+      }
+    }
+
+    dynamic "not_allowed" {
+      for_each = local.kubernetes.maintenanceNotAllowed != null ? [ local.kubernetes.maintenanceNotAllowed ] : []
+      content {
+        start = not_allowed.value.start
+        end = not_allowed.value.end
+      }
+    }
+  }
+
   default_node_pool {
     name                   = local.kubernetes.nodePools[0].name
     vm_size                = local.kubernetes.nodePools[0].vmSize

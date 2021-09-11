@@ -95,6 +95,12 @@ kubernetes:
   name: zone1-common-kube1
   skuTier: Free  # Free, Paid
   automaticChannelUpgrade: stable  # none, patch, rapid, stable
+  maintenanceAllowed:
+    - day: Sunday
+      hours: [ 4, 5, 6, 7 ]
+  maintenanceNotAllowed:
+    - start: 2021-12-01T16:00:00+00:00
+      end: 2021-12-30T08:00:00+00:00
 
   # Network
   networkPlugin: azure  # azure, kubenet
