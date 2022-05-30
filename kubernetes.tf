@@ -53,7 +53,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     orchestrator_version   = local.kubernetes.nodePools[0].orchestratorVersion
     enable_host_encryption = local.kubernetes.nodePools[0].enableHostEncryption
 
-    availability_zones     = local.kubernetes.nodePools[0].availabilityZones
+    zones                  = local.kubernetes.nodePools[0].zones
     vnet_subnet_id         = local.kubernetes.networkPlugin == "azure" ? var.subnet_id : null
 
     enable_auto_scaling    = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount
@@ -82,43 +82,37 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   # https://github.com/jcorioland/aks-rbac-azure-ad
   # https://www.danielstechblog.io/terraform-deploy-an-aks-cluster-using-managed-identity-and-managed-azure-ad-integration/
   # https://github.com/hashicorp/terraform-provider-azuread/issues/104
-  dynamic "role_based_access_control" {
+  dynamic "azure_active_directory_role_based_access_control" {
     for_each = local.kubernetes.rbacEnabled ? [ 1 ] : []
     content {
-      enabled                  = local.kubernetes.rbacEnabled
+      tenant_id                = local.kubernetes.azureAdTenantId
+      managed                  = local.kubernetes.azureAdManaged
 
-      azure_active_directory {
-        tenant_id              = local.kubernetes.azureAdTenantId
+      # Managed true
+      admin_group_object_ids   = coalesce(local.permissions.adminGroupObjectIds, [])
 
-        managed                = local.kubernetes.azureAdManaged
-
-        # Managed true
-        admin_group_object_ids = coalesce(local.permissions.adminGroupObjectIds, [])
-
-        # Managed false
-        client_app_id          = local.kubernetes.clientAppId
-        server_app_id          = local.kubernetes.serverAppId
-        server_app_secret      = local.kubernetes.serverAppSecret
-      }
+      # Managed false
+      client_app_id            = local.kubernetes.clientAppId
+      server_app_id            = local.kubernetes.serverAppId
+      server_app_secret        = local.kubernetes.serverAppSecret
     }
   }
 
-  addon_profile {
-    kube_dashboard {
-      enabled = false
-    }
-    oms_agent {
-      enabled                     = local.kubernetes.omsAgentEnabled != null ? local.kubernetes.omsAgentEnabled : false
+  dynamic "oms_agent" {
+    for_each = (local.kubernetes.omsAgentEnabled != null ? local.kubernetes.omsAgentEnabled : false) ? [ 1 ] : []
+    content {
       log_analytics_workspace_id  = var.log_analytics_workspace_id
     }
-    aci_connector_linux {
-      enabled                   = local.kubernetes.aciEnabled != null ? local.kubernetes.aciEnabled : false
+  }
+
+  dynamic "aci_connector_linux" {
+    for_each = (local.kubernetes.aciEnabled != null ? local.kubernetes.aciEnabled : false) ? [ 1 ] : []
+    content {
       subnet_name               = var.subnet_id  # TODO: ok?
     }
-    azure_policy {
-      enabled                   = local.kubernetes.azurePolicyEnabled != null ? local.kubernetes.azurePolicyEnabled : false
-    }
   }
+
+  azure_policy_enabled = local.kubernetes.azurePolicyEnabled != null ? local.kubernetes.azurePolicyEnabled : false
 
   lifecycle {
     prevent_destroy = true
@@ -135,7 +129,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "pool" {
   orchestrator_version   = each.value.orchestratorVersion
   enable_host_encryption = each.value.enableHostEncryption
 
-  availability_zones     = each.value.availabilityZones
+  zones                  = each.value.zones
   vnet_subnet_id         = local.kubernetes.networkPlugin == "azure" ? var.subnet_id : null
 
   enable_auto_scaling    = each.value.minNodeCount != each.value.maxNodeCount

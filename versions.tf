@@ -18,14 +18,14 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=2.76.0"
+      version = ">=3.8.0"
     }
     helm = {
       source = "hashicorp/helm"
-      version = ">=2.0.3"
+      version = ">=2.5.1"
     }
   }
 
-  required_version = ">= 0.14"
+  required_version = ">= 1.1.8"
   experiments = [module_variable_optional_attrs]
 }

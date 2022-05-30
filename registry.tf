@@ -20,9 +20,10 @@ resource "azurerm_container_registry" "acr" {
   location                 = var.location
   sku                      = "Standard"
   admin_enabled            = false
-  georeplication_locations = null
 
   /* TODO: enable for Premium sku
+  georeplication_locations
+  
   retention_policy {
     enabled = true
     days    = 7

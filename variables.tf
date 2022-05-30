@@ -78,7 +78,7 @@ variable "kubernetes" {
       osType = optional(string)
       orchestratorVersion = optional(string)
       enableHostEncryption = optional(bool)
-      availabilityZones = list(string)
+      zones = list(string)
       minNodeCount = number
       maxNodeCount = number
     }))

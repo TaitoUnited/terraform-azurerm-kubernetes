@@ -124,7 +124,7 @@ kubernetes:
   nodePools:
     - name: default
       vmSize: Standard_D2_v2
-      availabilityZones: [ "1", "2", "3" ]
+      zones: [ "1", "2", "3" ]
       minNodeCount: 3
       maxNodeCount: 3
 
