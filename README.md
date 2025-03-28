@@ -111,7 +111,6 @@ kubernetes:
 
   # RBAC
   rbacEnabled: true
-  azureAdManaged: true
 
   # Monitoring
   omsAgentEnabled: true

@@ -63,10 +63,7 @@ variable "kubernetes" {
     # RBAC
     rbacEnabled = bool
     azureAdTenantId = optional(string)
-    azureAdManaged = bool
-    clientAppId = optional(string)
-    serverAppId = optional(string)
-    serverAppSecret = optional(string)
+    azureRbacEnabled = optional(bool)
     # Monitoring
     omsAgentEnabled = optional(bool)
     # Add-ons

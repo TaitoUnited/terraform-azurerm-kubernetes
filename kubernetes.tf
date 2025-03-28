@@ -24,9 +24,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
   node_resource_group = "${var.resource_group_name}-${local.kubernetes.name}"
 
   sku_tier                        = local.kubernetes.skuTier                   # Free, Paid
-  automatic_channel_upgrade       = local.kubernetes.automaticChannelUpgrade   # none, patch, rapid, and stable
+  automatic_upgrade_channel       = local.kubernetes.automaticChannelUpgrade   # none, patch, rapid, and stable
   private_cluster_enabled         = local.kubernetes.privateClusterEnabled
-  api_server_authorized_ip_ranges = local.kubernetes.masterAuthorizedNetworks
+
+  api_server_access_profile {
+    authorized_ip_ranges = local.kubernetes.masterAuthorizedNetworks
+  }
 
   maintenance_window {
     dynamic "allowed" {
@@ -51,12 +54,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     vm_size                = local.kubernetes.nodePools[0].vmSize
     # os_type                = local.kubernetes.nodePools[0].osType
     orchestrator_version   = local.kubernetes.nodePools[0].orchestratorVersion
-    enable_host_encryption = local.kubernetes.nodePools[0].enableHostEncryption
+    host_encryption_enabled = local.kubernetes.nodePools[0].enableHostEncryption
 
     zones                  = local.kubernetes.nodePools[0].zones
     vnet_subnet_id         = local.kubernetes.networkPlugin == "azure" ? var.subnet_id : null
 
-    enable_auto_scaling    = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount
+    auto_scaling_enabled   = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount
     node_count             = local.kubernetes.nodePools[0].minNodeCount
     min_count              = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount ? local.kubernetes.nodePools[0].minNodeCount : null
     max_count              = local.kubernetes.nodePools[0].minNodeCount != local.kubernetes.nodePools[0].maxNodeCount ? local.kubernetes.nodePools[0].maxNodeCount : null
@@ -86,15 +89,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes" {
     for_each = local.kubernetes.rbacEnabled ? [ 1 ] : []
     content {
       tenant_id                = local.kubernetes.azureAdTenantId
-      managed                  = local.kubernetes.azureAdManaged
-
-      # Managed true
       admin_group_object_ids   = coalesce(local.permissions.adminGroupObjectIds, [])
-
-      # Managed false
-      client_app_id            = local.kubernetes.clientAppId
-      server_app_id            = local.kubernetes.serverAppId
-      server_app_secret        = local.kubernetes.serverAppSecret
+      azure_rbac_enabled       = local.kubernetes.azureRbacEnabled
     }
   }
 
@@ -127,12 +123,12 @@ resource "azurerm_kubernetes_cluster_node_pool" "pool" {
   vm_size                = each.value.vmSize
   os_type                = each.value.osType
   orchestrator_version   = each.value.orchestratorVersion
-  enable_host_encryption = each.value.enableHostEncryption
+  host_encryption_enabled = each.value.enableHostEncryption
 
   zones                  = each.value.zones
   vnet_subnet_id         = local.kubernetes.networkPlugin == "azure" ? var.subnet_id : null
 
-  enable_auto_scaling    = each.value.minNodeCount != each.value.maxNodeCount
+  auto_scaling_enabled   = each.value.minNodeCount != each.value.maxNodeCount
   node_count             = each.value.minNodeCount
   min_count              = each.value.minNodeCount != each.value.maxNodeCount ? each.value.minNodeCount : null
   max_count              = each.value.minNodeCount != each.value.maxNodeCount ? each.value.maxNodeCount : null
